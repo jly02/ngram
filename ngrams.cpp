@@ -15,12 +15,12 @@ int main(void) {
     } else {
         // testing area
         while(getline(file, text)) {
-            std::cout << text << std::endl;
+            std::cout << text << '\n';
         }
 
         /* FOR ITERATING THROUGH EACH FILE IN OANC DIRECTORY */
         // std::string path = "./oanc";
-        // for (const auto & entry : fs::directory_iterator(path)) {
+        // for(const auto& entry : fs::directory_iterator(path)) {
         //     std::cout << entry.path() << std::endl;
         // }
     }
