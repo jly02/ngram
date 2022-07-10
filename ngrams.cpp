@@ -7,6 +7,7 @@
 namespace fs = std::filesystem;
 using std::string;
 using std::vector;
+using std::cout;
 
 /**
  * @brief Splits a given string into words by space.
@@ -38,21 +39,21 @@ int main(void) {
     } else {
         // testing area
         // while(getline(file, text)) {
-        //     std::cout << text << '\n';
+        //     cout << text << '\n';
         // }
 
         while(getline(file, text)) {
             vector<string> splitWords = split(text);
 
             for(const auto& word : splitWords) {
-                std::cout << word << '\n';
+                cout << word << '\n';
             }
         }
 
         /* FOR ITERATING THROUGH EACH FILE IN OANC DIRECTORY */
-        // std::string path = "./oanc";
+        // string path = "./oanc";
         // for(const auto& entry : fs::directory_iterator(path)) {
-        //     std::cout << entry.path() << std::endl;
+        //     cout << entry.path() << std::endl;
         // }
     }
 
