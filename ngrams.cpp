@@ -1,9 +1,19 @@
 #include <iostream>
+#include <fstream>
+#include <string>
 
 int main(void) {
     int n;
-    std::cout << "Pick a number." << std::endl;
-    std::cin >> n;
+    std::string text;
+    std::ifstream file("./oanc/1-3_meth_901.txt");
 
-    std::cout << "Your number is: " << n << std::endl;
+    if(!file) {
+        std::cerr << "Could not open the file!" << std::endl;
+    } else {
+        while(getline(file, text)) {
+            std::cout << text << std::endl;
+        }
+    }
+
+    file.close();
 }
