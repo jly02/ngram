@@ -9,7 +9,7 @@ using std::string;
 using std::vector;
 
 /**
- * @brief splits a given string into words by space
+ * @brief Splits a given string into words by space.
  * 
  * @param text the text to be split
  * @return vector<string> a vector of the words after being split
