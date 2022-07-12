@@ -50,7 +50,7 @@ class NGramModel {
 
         for(index_t i = 0; i < words.size() - 2; i++) {
             // tuple of ({w - 2} + {w - 1}, w) 
-            string context = words.at(i) + " " + words.at(i + 1);
+            string context = words.at(i) + ' ' + words.at(i + 1);
             this->context_ngrams[context][words.at(i + 2)]++;
         }
     }
@@ -61,7 +61,15 @@ class NGramModel {
     void load() {
         cout << "Parsing files..." << '\n';
         if(file_exists("./ngrams.cache")) {
-
+            std::ifstream file("./ngrams.cache");
+            string text;
+            while(getline(file, text)) {
+                vector<string> words = tokenize(text);
+                string context = words.at(0) + ' ' + words.at(1);
+                for(index_t i = 2; i < words.size() - 1; i++) {
+                    this->context_ngrams[context][words.at(i)] = stoi(words.at(i + 1));
+                }
+            }
         } else {
             std::ifstream file;
             string path = "./oanc";
@@ -69,7 +77,7 @@ class NGramModel {
             for(const auto& entry : fs::directory_iterator(path)) {
                 file.open(entry.path());
                 while(getline(file, text)) {
-                    vector<string> words = NGramModel::tokenize(text + " ");
+                    vector<string> words = NGramModel::tokenize(text + ' ');
                     update_model(words);
                 }
 
@@ -86,7 +94,15 @@ class NGramModel {
     void cache_ngrams() {
         std::ofstream ngram_cache("ngrams.cache");
         ngram_cache.clear();
-        ngram_cache << "gaming" << '\n';
+        for(const auto& [key, gram_map] : this->context_ngrams) {
+            ngram_cache << key;
+            for(const auto& [key2, gram_freq] : gram_map) {
+                ngram_cache << ' ' << key2 << ' ' << gram_freq << ' ';
+            }
+
+            ngram_cache << '\n';
+        }
+
         ngram_cache.close();
     }
 
@@ -102,10 +118,16 @@ class NGramModel {
             return " ";
         }
 
-        int rand_i = range_rand(0, possible_words.size() - 1);
-        map<string, int>::iterator it = possible_words.begin();
-        std::advance(it, rand_i);
-        return std::get<0>(*it);
+        vector<string> word_freq{};
+        for(const auto& [key, freq] : possible_words) {
+            for(index_t i = 0; i < freq; i++) {
+                word_freq.push_back(key);
+            }
+        }
+
+        int rand_i = range_rand(0, word_freq.size() - 1);
+        vector<string>::iterator it = word_freq.begin();
+        return *(it + rand_i);
     }
 
     /**
@@ -115,13 +137,18 @@ class NGramModel {
      * @return string the generated string
      */
     string gen_sentence(string seed) {
-        vector<string> context = tokenize(seed + " ");
+        vector<string> context = tokenize(seed + ' ');
+
+        if(context.size() < 2) {
+            throw std::invalid_argument("Input cannot be less than two words!");
+        }
+
         string sentence = context.at(0) + ' ' + context.at(1);
         string prediction;
         while((prediction = predict(context.at(0) + ' ' + context.at(1))) != " ") {
             context.push_back(prediction);
             context.erase(context.begin());
-            sentence += " " + context.at(1);
+            sentence += ' ' + context.at(1);
             prediction = predict(context.at(0) + ' ' + context.at(1));
         }
 
@@ -222,26 +249,24 @@ class NGramModel {
 
 int main(void) {
     NGramModel model = NGramModel();
-    model.load();
+    // model.load();
 
-    // std::ifstream file("./oanc/1-3_meth_901.txt");
-    // string text;
-    // while(getline(file, text)) {
-    //     vector<string> words = NGramModel::tokenize(text + " ");
-    //     model.update_model(words);
-    // }
+    std::ifstream file("./oanc/1-3_meth_901.txt");
+    string text;
+    while(getline(file, text)) {
+        vector<string> words = NGramModel::tokenize(text + ' ');
+        model.update_model(words);
+    }
+    // model.cache_ngrams();
 
-    model.cache_ngrams();
-    cout << model.gen_sentence("it is") << '\n';
-    cout << model.ngram_prob("it is", "not") << '\n';
-    // string input;
-    // cout << "Input a seed (at least two words): " << '\n';
-    // cin >> input;
-    // while(input != "STOP") {
-    //     cout << model.gen_sentence(input + " ") << '\n';
-    //     cout << "Input a seed (at least two words): " << '\n';
-    //     cin >> input;
-    // }
+    string input;
+    cout << "Input a seed (at least two words): " << '\n';
+    std::getline(cin, input);
+    while(input != "STOP") {
+        cout << model.gen_sentence(input) << '\n';
+        cout << "Input a seed (at least two words): " << '\n';
+        std::getline(cin, input);
+    }
 
     // file.close();
     return EXIT_SUCCESS;
