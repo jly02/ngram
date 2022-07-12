@@ -4,15 +4,18 @@
 #include <filesystem>
 #include <vector>
 #include <map>
+#include <set>
 
 namespace fs = std::filesystem;
 using index_t = std::vector<int>::size_type;
+using std::set;
+using std::pair;
 using std::string;
 using std::vector;
 using std::map;
 using std::cout;
 
-vector<string> split(string text) {
+vector<string> tokenize(string text) {
     string space_delimiter = " ";
     vector<string> words{};
 
@@ -25,29 +28,26 @@ vector<string> split(string text) {
     return words;
 }
 
-void trigrams(vector<string> words) {
-    vector<string> triwords{};
+void gen_trigrams(vector<string> words, map<string, set<string>> &context, map<pair<string, string>, int> &ngram_counter) {
     if(words.size() < 3) {
         return;
     }
 
     for(index_t i = 0; i < words.size() - 2; i++) {
-        // put three words together
-        triwords.push_back(words.at(i) + " " + words.at(i + 1) + " " + words.at(i + 2));
-    }
-
-    for(const auto& word : triwords) {
-        cout << word << '\n';
+        // tuple of ({w - 2} + {w - 1}, w) 
+        string key = words.at(i) + " " + words.at(i + 1);
+        context[key].insert(words.at(i + 2));
+        ngram_counter[std::make_pair(key, words.at(i + 2))]++;
     }
 }
 
 int main(void) {
-    int n;
-    string text;
-    std::ifstream file("./oanc/1-3_meth_901.txt");
-    map<string, int> freq{};
+    std::ifstream file("./oanc/1-3_meth_901.txt"); // testing file
 
-    // Check for error opening file
+    map<string, set<string>> context{};
+    map<pair<string, string>, int> ngram_counter{};
+
+    // Check for errors opening files
     if(!file) {
         std::cerr << "Could not open the file!" << std::endl;
     } else {
@@ -56,9 +56,14 @@ int main(void) {
         //     cout << text << '\n';
         // }
 
+        string text;
         while(getline(file, text)) {
-            vector<string> splitWords = split(text + " ");
-            trigrams(splitWords);
+            vector<string> words = tokenize(text + " ");
+            gen_trigrams(words, context, ngram_counter);
+        }
+
+        for(const auto& [key, val] : ngram_counter) {
+            cout << '\'' << std::get<0>(key) << "', '" << std::get<1>(key) << "' => " << val << '\n';
         }
 
         /* FOR ITERATING THROUGH EACH FILE IN OANC DIRECTORY */
