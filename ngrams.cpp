@@ -4,14 +4,12 @@
 #include <filesystem>
 #include <vector>
 #include <map>
-#include <set>
 #include <time.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 
 namespace fs = std::filesystem;
 using index_t = std::vector<int>::size_type;
-using std::set;
 using std::pair;
 using std::string;
 using std::vector;
@@ -60,17 +58,24 @@ class NGramModel {
      */
     void load() {
         cout << "Parsing files..." << '\n';
+        
         if(file_exists("./ngrams.cache")) {
+            // Cache file will be parsed if it exists
+            cout << "Reading from ngrams.cache..." << '\n';
+
             std::ifstream file("./ngrams.cache");
             string text;
+            vector<string> words{};
+            string context;
             while(getline(file, text)) {
-                vector<string> words = tokenize(text);
-                string context = words.at(0) + ' ' + words.at(1);
-                for(index_t i = 2; i < words.size() - 1; i++) {
+                words = tokenize(text + " ");
+                context = words.at(0) + ' ' + words.at(1);
+                for(index_t i = 2; i < words.size() - 1; i += 2) {
                     this->context_ngrams[context][words.at(i)] = stoi(words.at(i + 1));
                 }
             }
         } else {
+            // If not, manually parse every file in the OANC directory and gather the data
             std::ifstream file;
             string path = "./oanc";
             string text;
@@ -97,13 +102,14 @@ class NGramModel {
         for(const auto& [key, gram_map] : this->context_ngrams) {
             ngram_cache << key;
             for(const auto& [key2, gram_freq] : gram_map) {
-                ngram_cache << ' ' << key2 << ' ' << gram_freq << ' ';
+                ngram_cache << ' ' << key2 << ' ' << gram_freq;
             }
 
             ngram_cache << '\n';
         }
 
         ngram_cache.close();
+        cout << "Parsed data has been cached into ngrams.cache" << '\n';
     }
 
     /**
@@ -145,11 +151,16 @@ class NGramModel {
 
         string sentence = context.at(0) + ' ' + context.at(1);
         string prediction;
+        size_t sentence_length = 2;
         while((prediction = predict(context.at(0) + ' ' + context.at(1))) != " ") {
             context.push_back(prediction);
             context.erase(context.begin());
             sentence += ' ' + context.at(1);
             prediction = predict(context.at(0) + ' ' + context.at(1));
+
+            if(++sentence_length == 150) {
+                break;
+            }
         }
 
         return sentence;
@@ -219,16 +230,6 @@ class NGramModel {
         return words;
     }
 
-    // for testing purposes
-    void print_ngrams() {
-        /* REWORKING IN PROGRESS */
-        for(const auto& [key, gram_map] : this->context_ngrams) {
-            for(const auto& [key2, gram_freq] : gram_map) {
-                cout << '\'' << key << "', '" << key2 << "' => " << gram_freq << '\n';
-            }
-        }
-    }
-
   private:
     // Stores trigrams as context -> (possible words -> frequency of those words) 
     map<string, map<string, int>> context_ngrams;
@@ -249,14 +250,8 @@ class NGramModel {
 
 int main(void) {
     NGramModel model = NGramModel();
-    // model.load();
-
-    std::ifstream file("./oanc/1-3_meth_901.txt");
-    string text;
-    while(getline(file, text)) {
-        vector<string> words = NGramModel::tokenize(text + ' ');
-        model.update_model(words);
-    }
+    model.load();
+    // Uncomment this if you have not yet created a cache file.
     // model.cache_ngrams();
 
     string input;
@@ -268,6 +263,5 @@ int main(void) {
         std::getline(cin, input);
     }
 
-    // file.close();
     return EXIT_SUCCESS;
 }
