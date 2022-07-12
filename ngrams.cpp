@@ -66,7 +66,17 @@ class NGramModel {
     }
 
     string gen_sentence(size_t length) {
-        // to be implemented
+        vector<string> context{};
+        context.push_back("<START>");
+        context.push_back("<START>");
+        string sentence = "<START> <START>";
+        for(index_t i = 0; i < length; i++) {
+            context.push_back(predict(context.at(0) + ' ' + context.at(1)));
+            context.erase(context.begin());
+            sentence += " " + context.at(1);
+        }
+
+        return sentence;
     }
 
     string ngram_prob(string context) {
@@ -142,7 +152,7 @@ int main(void) {
         }
 
         // model.print_ngrams();
-        cout << model.predict("would be") << '\n';
+        cout << model.predict("it is") << '\n';
 
         /* FOR ITERATING THROUGH EACH FILE IN OANC DIRECTORY */
         // string path = "./oanc";
