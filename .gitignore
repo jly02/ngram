@@ -33,3 +33,6 @@
 
 # VS Code stuff
 .vscode/
+
+# Cache storage that can be generated per user
+*.cache
