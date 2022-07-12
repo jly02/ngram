@@ -16,24 +16,9 @@ using std::string;
 using std::vector;
 using std::map;
 using std::cout;
+using std::cin;
 
 class NGramModel {
-  private:
-    map<string, set<string>> context_cand;
-    map<pair<string, string>, int> ngram_counter;
-
-    int range_rand(int min, int max){
-        int n = max - min + 1;
-        int remainder = RAND_MAX % n;
-        int x;
-
-        do {
-            x = rand();
-        } while(x >= RAND_MAX - remainder);
-
-        return min + x % n;
-    }
-
   public:
     NGramModel() {
         srand(time(NULL));
@@ -54,33 +39,53 @@ class NGramModel {
         }
     }
 
-    // Not yet implemented.
+    void load() {
+        std::ifstream file;
+        string path = "./oanc";
+        string text;
+        cout << "Parsing files..." << '\n';
+        for(const auto& entry : fs::directory_iterator(path)) {
+            file.open(entry.path());
+            while(getline(file, text)) {
+                vector<string> words = NGramModel::tokenize(text + " ");
+                update_model(words);
+            }
+            file.close();
+        }
+
+        cout << "Done!" << "\n";
+    }
+
+    // Not yet fully implemented.
     string predict(string context) {
         set<string> possible_words = this->context_cand[context];
-        // int numContext = ngram_counter[std::make_pair(context, "")];
-        index_t rand_i = range_rand(0, possible_words.size() - 1);
+        if(possible_words.size() == 0) {
+            return " ";
+        }
 
+        index_t rand_i = range_rand(0, possible_words.size() - 1);
         set<string>::iterator it = possible_words.begin();
         std::advance(it, rand_i);
         return *(it);
     }
 
-    string gen_sentence(size_t length) {
-        vector<string> context{};
-        context.push_back("<START>");
-        context.push_back("<START>");
-        string sentence = "<START> <START>";
-        for(index_t i = 0; i < length; i++) {
-            context.push_back(predict(context.at(0) + ' ' + context.at(1)));
+    string gen_sentence(string seed) {
+        vector<string> context = tokenize(seed);
+        string sentence = context.at(0) + ' ' + context.at(1);
+        string prediction;
+        while((prediction = predict(context.at(0) + ' ' + context.at(1))) != " ") {
+            context.push_back(prediction);
             context.erase(context.begin());
             sentence += " " + context.at(1);
+            prediction = predict(context.at(0) + ' ' + context.at(1));
         }
 
         return sentence;
     }
 
-    string ngram_prob(string context) {
+    string ngram_prob(string context, string prediction) {
         // to be implemented
+        return "Not yet implemented.";
     }
 
     /**
@@ -94,7 +99,7 @@ class NGramModel {
         vector<string> words{};
 
         size_t pos = 0;
-        while ((pos = text.find(delimiter)) != string::npos) {
+        while((pos = text.find(delimiter)) != string::npos) {
             words.push_back(text.substr(0, pos));
             text.erase(0, pos + delimiter.length());
         }
@@ -113,7 +118,7 @@ class NGramModel {
         vector<string> words{};
 
         size_t pos = 0;
-        while ((pos = text.find(delimiter)) != string::npos) {
+        while((pos = text.find(delimiter)) != string::npos) {
             words.push_back(text.substr(0, pos));
             text.erase(0, pos + delimiter.length());
         }
@@ -127,40 +132,37 @@ class NGramModel {
             cout << '\'' << std::get<0>(key) << "', '" << std::get<1>(key) << "' => " << val << '\n';
         }
     }
+
+  private:
+    map<string, set<string>> context_cand;
+    map<pair<string, string>, int> ngram_counter;
+
+    int range_rand(int min, int max){
+        int n = max - min + 1;
+        int remainder = RAND_MAX % n;
+        int x;
+
+        do {
+            x = rand();
+        } while(x >= RAND_MAX - remainder);
+
+        return min + x % n;
+    }
 };
 
 int main(void) {
-    std::ifstream file("./oanc/1-3_meth_901.txt"); // testing file
+    NGramModel model = NGramModel();
+    model.load();
 
-    map<string, set<string>> context{};
-    map<pair<string, string>, int> ngram_counter{};
-
-    // Check for errors opening files
-    if(!file) {
-        std::cerr << "Could not open the file!" << std::endl;
-    } else {
-        // testing area
-        // while(getline(file, text)) {
-        //     cout << text << '\n';
-        // }
-
-        NGramModel model = NGramModel();
-        string text;
-        while(getline(file, text)) {
-            vector<string> words = NGramModel::tokenize(text + " ");
-            model.update_model(words);
-        }
-
-        // model.print_ngrams();
-        cout << model.predict("it is") << '\n';
-
-        /* FOR ITERATING THROUGH EACH FILE IN OANC DIRECTORY */
-        // string path = "./oanc";
-        // for(const auto& entry : fs::directory_iterator(path)) {
-        //     cout << entry.path() << std::endl;
-        // }
+    // test with just the single file again tomorrow
+    string input;
+    cout << "Input a seed (at least two words): " << '\n';
+    cin >> input;
+    while(input != "STOP") {
+        cout << model.gen_sentence(input + " ") << '\n';
+        cout << "Input a seed (at least two words): " << '\n';
+        cin >> input;
     }
 
-    file.close();
     return EXIT_SUCCESS;
 }
