@@ -1,7 +1,7 @@
 # ngram
 An n-gram model for language prediction created using the Open American National Corpus.
 
-<sup><sub>that's a lie it only actually does trigrams</sub></sup>
+<sup><sub>that's a lie it actually only does trigrams</sub></sup>
 
 Compile the .cpp using the c++17 standard and the compiler of your choice, and running the `ngrams.cpp` file will prompt you to give a few seeded words to use in generating a sentence.
 
