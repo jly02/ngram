@@ -132,8 +132,7 @@ class NGramModel {
         }
 
         int rand_i = range_rand(0, word_freq.size() - 1);
-        vector<string>::iterator it = word_freq.begin();
-        return *(it + rand_i);
+        return word_freq.at(rand_i);
     }
 
     /**
@@ -156,7 +155,6 @@ class NGramModel {
             context.push_back(prediction);
             context.erase(context.begin());
             sentence += ' ' + context.at(1);
-            prediction = predict(context.at(0) + ' ' + context.at(1));
 
             if(++sentence_length == 150) {
                 break;
