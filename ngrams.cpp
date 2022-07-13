@@ -1,4 +1,5 @@
 #include <iostream>
+#include <random>
 #include <fstream>
 #include <string>
 #include <filesystem>
@@ -32,7 +33,6 @@ inline bool file_exists(const string& name) {
 class NGramModel {
   public:
     NGramModel() {
-        srand(time(NULL));
         context_ngrams = {};
     }
 
@@ -57,11 +57,11 @@ class NGramModel {
      * @brief loads all OANC-provided text files into the model.
      */
     void load() {
-        cout << "Parsing files..." << '\n';
+        cout << "Parsing files...\n";
         
         if(file_exists("./ngrams.cache")) {
             // Cache file will be parsed if it exists
-            cout << "Reading from ngrams.cache..." << '\n';
+            cout << "Reading from ngrams.cache...\n";
 
             std::ifstream file("./ngrams.cache");
             string text;
@@ -90,7 +90,7 @@ class NGramModel {
             }
         }
 
-        cout << "Done!" << "\n";
+        cout << "Done!\n";
     }
 
     /**
@@ -109,7 +109,7 @@ class NGramModel {
         }
 
         ngram_cache.close();
-        cout << "Parsed data has been cached into ngrams.cache" << '\n';
+        cout << "Parsed data has been cached into ngrams.cache\n";
     }
 
     /**
@@ -231,18 +231,15 @@ class NGramModel {
   private:
     // Stores trigrams as context -> (possible words -> frequency of those words) 
     map<string, map<string, int>> context_ngrams;
+    std::random_device rd;
 
     // Calculates a random value between a given range. max cannot be less than min.
     int range_rand(int min, int max){
-        int n = max - min + 1;
-        int remainder = RAND_MAX % n;
-        int x;
+        std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+        std::uniform_int_distribution<int> uni(min, max); // guaranteed unbiased
 
-        do {
-            x = rand();
-        } while(x >= RAND_MAX - remainder);
-
-        return min + x % n;
+        auto random_integer = uni(rng);
+        return random_integer;
     }
 };
 
@@ -253,11 +250,11 @@ int main(void) {
     // model.cache_ngrams();
 
     string input;
-    cout << "Input a seed (at least two words): " << '\n';
+    cout << "Input a seed (at least two words): \n";
     std::getline(cin, input);
     while(input != "STOP") {
         cout << model.gen_sentence(input) << '\n';
-        cout << "Input a seed (at least two words): " << '\n';
+        cout << "Input a seed (at least two words): \n";
         std::getline(cin, input);
     }
 
