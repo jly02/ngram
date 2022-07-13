@@ -8,7 +8,7 @@ Compile the .cpp using the c++17 standard and the compiler of your choice, and r
 # The OANC
 "The Open American National Corpus is a roughly 15 million word subset of the ANC Second Release that is unrestricted in terms of usage and redistribution." - [ANC Website](https://anc.org/data/oanc/)
 
-Parsing such a large dataset is expensive. Compounded with my probably-noob-ish skill with C++, this means that the OANC files take a long time to fully read and load into the model (about 64 seconds on my machine). To somewhat combat this, a method for storing the parsed data into a cache file has been given to speed up each run of the program (it only provides about a 25% reduction in runtime, not sure how to make it any faster).
+Parsing such a large dataset is expensive. Compounded with my probably-noob-ish skill with C++, this means that the OANC files take a long time to fully read and load into the model (about 64 seconds on my machine, without the `-O1` flag). To somewhat combat this, a method for storing the parsed data into a cache file has been given to speed up each run of the program (it only provides about a 25% reduction in runtime, not sure how to make it any faster).
 ```cpp
 NGramModel model = NGramModel();
 model.load();
