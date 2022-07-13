@@ -1,21 +1,18 @@
-#include <iostream>
-#include <random>
-#include <fstream>
-#include <string>
+#include <sys/stat.h>
 #include <filesystem>
+#include <iostream>
+#include <fstream>
+#include <random>
+#include <string>
 #include <vector>
 #include <map>
-#include <time.h>
-#include <stdlib.h>
-#include <sys/stat.h>
 
-namespace fs = std::filesystem;
 using index_t = std::vector<int>::size_type;
-using std::pair;
+namespace fs = std::filesystem;
 using std::string;
 using std::vector;
-using std::map;
 using std::cout;
+using std::map;
 using std::cin;
 
 /**
