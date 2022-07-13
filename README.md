@@ -3,7 +3,7 @@ An n-gram model for language prediction created using the Open American National
 
 <sup><sub>that's a lie it actually only does trigrams</sub></sup>
 
-Compile the .cpp using the c++17 standard and the compiler of your choice, and running the `ngrams.cpp` file will prompt you to give a few seeded words to use in generating a sentence.
+Compile `ngrams.cpp` using the c++17 standard and the compiler of your choice, and running the program will prompt you to give a few seeded words to use in generating a sentence.
 
 # The OANC
 "The Open American National Corpus is a roughly 15 million word subset of the ANC Second Release that is unrestricted in terms of usage and redistribution." - [ANC Website](https://anc.org/data/oanc/)
