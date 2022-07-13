@@ -23,7 +23,7 @@ On every subsequent `load()` call, the program will search for the `ngrams.cache
 
 > Using the `-O1` flag can reduce runtime to around 28 seconds, with negligible reduction in runtime with cache
 
-> On my Linux machine (running Ubuntu 20.04), the `-O1` flag with cache led to parsing times as low as 6 seconds with cache
+> On my Linux machine (running Ubuntu 20.04), the `-O1` flag with cache led to parsing times as low as 6 seconds
 
 # Predicting Words / Generating Sentences
 Given a specific context (of two words), the model is able to predict words, or generate a string until it can no longer generate further:
