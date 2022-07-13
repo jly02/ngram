@@ -18,8 +18,11 @@ On every subsequent `load()` call, the program will search for the `ngrams.cache
 
 ### Notes
 > The following timings were calculated on my (Windows) machine:
+
 > Full read and load takes about 64 seconds, which is reduced to 47 seconds with the cache (not much, but not sure how to make it faster)
+
 > Using the `-O1` flag can reduce runtime to around 28 seconds, with negligible reduction in runtime with cache
+
 > On my Linux machine (running Ubuntu 20.04), the `-O1` flag with cache led to parsing times as low as 6 seconds with cache
 
 # Predicting Words / Generating Sentences
