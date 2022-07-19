@@ -1,5 +1,5 @@
 # ngram
-An n-gram model for language prediction created using the Open American National Corpus.
+An n-gram model for language generation created using the Open American National Corpus.
 
 <sup><sub>that's a lie it actually only does trigrams</sub></sup>
 
