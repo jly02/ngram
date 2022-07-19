@@ -250,7 +250,7 @@ int main(void) {
     cout << "Input a seed (at least two words): \n";
     std::getline(cin, input);
     while(input != "STOP") {
-        cout << model.gen_sentence(input) << '\n';
+        cout << "Generated sentence:\n" << model.gen_sentence(input) << '\n';
         cout << "Input a seed (at least two words): \n";
         std::getline(cin, input);
     }
